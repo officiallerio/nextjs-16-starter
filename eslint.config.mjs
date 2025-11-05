@@ -1,18 +1,72 @@
 import { defineConfig, globalIgnores } from "eslint/config";
+
+// ✅ Base Next.js configs
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
-const eslintConfig = defineConfig([
+// ✅ Extra plugins
+import eslintConfigPrettier from "eslint-config-prettier";
+import pluginReact from "eslint-plugin-react";
+import pluginPromise from "eslint-plugin-promise";
+import pluginUnusedImports from "eslint-plugin-unused-imports";
+import pluginTanstackQuery from "@tanstack/eslint-plugin-query";
+import globals from "globals";
+
+export default defineConfig([
+  // Include Next.js’ own configs
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
 
-export default eslintConfig;
+  // Optional extra recommended configs (excluding import!)
+  pluginReact.configs.flat.recommended,
+  pluginReact.configs.flat["jsx-runtime"],
+  pluginPromise.configs["flat/recommended"],
+  pluginTanstackQuery.configs["flat/recommended"],
+  eslintConfigPrettier,
+
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      globals: { ...globals.browser, ...globals.node },
+    },
+    plugins: {
+      react: pluginReact,
+      promise: pluginPromise,
+      "unused-imports": pluginUnusedImports,
+    },
+    settings: {
+      react: { version: "detect" },
+      "import/resolver": {
+        typescript: { project: "./tsconfig.json" },
+        node: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+      },
+    },
+    rules: {
+      // ✅ Unused imports cleanup
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        { vars: "all", varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
+      ],
+
+      // ✅ Common React / Next tweaks
+      "react/react-in-jsx-scope": "off",
+      "react/display-name": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "@next/next/no-img-element": "off",
+
+      // ✅ Misc
+      "newline-before-return": "error",
+      "@typescript-eslint/no-empty-object-type": [
+        "error",
+        { allowInterfaces: "with-single-extends" },
+      ],
+    },
+  },
+
+  // ✅ Keep same ignore defaults as Next.js
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+]);
