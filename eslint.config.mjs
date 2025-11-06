@@ -1,3 +1,4 @@
+import eslint from '@eslint/js';
 import pluginTanstackQuery from '@tanstack/eslint-plugin-query';
 
 // ✅ Base Next.js configs
@@ -10,6 +11,7 @@ import pluginReact from 'eslint-plugin-react';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   // Include Next.js’ own configs
@@ -17,6 +19,9 @@ export default defineConfig([
   ...nextTs,
 
   // Optional extra recommended configs (excluding import!)
+  eslint.configs.recommended,
+  tseslint.configs.strict,
+  tseslint.configs.stylistic,
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat['jsx-runtime'],
   pluginPromise.configs['flat/recommended'],
@@ -56,6 +61,7 @@ export default defineConfig([
       'react/display-name': 'off',
       'react-hooks/exhaustive-deps': 'off',
       '@next/next/no-img-element': 'off',
+      'react/prop-types': 'off',
 
       // ✅ Misc
       'newline-before-return': 'error',
